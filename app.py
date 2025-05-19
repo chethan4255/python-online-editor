@@ -1,41 +1,36 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, jsonify
 import subprocess
-import tempfile
 import os
 
 app = Flask(__name__)
 
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 @app.route('/run', methods=['POST'])
 def run_code():
-    data = request.json
-    code = data.get('code', '')
+    data = request.get_json()
+    code = data.get('code')
+    user_input = data.get('input', '')
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as tmp:
-        tmp.write(code.encode())
-        tmp_filename = tmp.name
+    with open('temp.py', 'w') as f:
+        f.write(code)
 
     try:
         result = subprocess.run(
-            ['python', tmp_filename],
+            ['python', 'temp.py'],
+            input=user_input.encode('utf-8'),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            timeout=5,
-            text=True
+            timeout=5
         )
-        output = result.stdout + result.stderr
+        output = result.stdout.decode() + result.stderr.decode()
     except subprocess.TimeoutExpired:
         output = "Error: Code execution timed out."
-    finally:
-        os.remove(tmp_filename)
 
     return jsonify({'output': output})
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-
+    app.run(host='0.0.0.0', port=port)

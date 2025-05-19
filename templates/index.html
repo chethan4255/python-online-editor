@@ -1,70 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Python Editor</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-  textarea { width: 100%; height: 200px; font-family: monospace; font-size: 16px; }
-  pre { background: #f0f0f0; padding: 10px; white-space: pre-wrap; min-height: 100px; }
-  button { margin-top: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-</style>
-<script>
-async function runCode() {
-  const code = document.getElementById('code').value;
-  const outputElem = document.getElementById('output');
-  outputElem.textContent = "Running...";
-
-  try {
-    const response = await fetch('/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
-    });
-
-    if (!response.ok) throw new Error('Network response was not ok');
-
-    const data = await response.json();
-    outputElem.textContent = data.output;
-  } catch (error) {
-    outputElem.textContent = "Error: " + error.message;
-  }
-}
-</script>
-
+    <meta charset="UTF-8">
+    <title>Python Online Code Editor</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 1rem;
+        }
+        #output {
+            white-space: pre-wrap;
+            background: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
+    <h1>Python Online Code Editor</h1>
+    <form id="editor-form">
+        <label for="code">Code:</label><br>
+        <textarea id="code" name="code" required>print("Hello, World!")</textarea><br>
 
-<h2>Online Python Code Editor</h2>
+        <label for="input">Standard Input (stdin):</label><br>
+        <textarea id="input" name="input" placeholder="Enter input for input() functions..."></textarea><br>
 
-<textarea id="code" placeholder="Write your Python code here...">print("Hello, World!")</textarea>
-<br />
-<button onclick="runCode()">Run Code</button>
+        <button type="submit">Run Code</button>
+    </form>
+    <h2>Output:</h2>
+    <div id="output"></div>
 
-<h3>Output:</h3>
-<pre id="output"></pre>
+    <script>
+        const form = document.getElementById('editor-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
 
-<script>
-async function runCode() {
-  const code = document.getElementById('code').value;
-  const outputElem = document.getElementById('output');
-  outputElem.textContent = "Running...";
+            const response = await fetch('/run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: document.getElementById('code').value,
+                    input: document.getElementById('input').value
+                })
+            });
 
-  try {
-    const response = await fetch('/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
-    });
-
-    const data = await response.json();
-    outputElem.textContent = data.output;
-  } catch (error) {
-    outputElem.textContent = "Error: " + error.message;
-  }
-}
-</script>
-
+            const data = await response.json();
+            document.getElementById('output').textContent = data.output;
+        };
+    </script>
 </body>
 </html>
