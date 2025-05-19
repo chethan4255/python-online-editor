@@ -2,38 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Python Online Code Editor</title>
+    <title>Python Code Editor</title>
     <style>
         textarea {
             width: 100%;
-            height: 200px;
+            height: 150px;
             margin-bottom: 1rem;
         }
         #output {
             white-space: pre-wrap;
-            background: #f0f0f0;
-            padding: 10px;
+            background-color: #f9f9f9;
             border: 1px solid #ccc;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Python Online Code Editor</h1>
-    <form id="editor-form">
-        <label for="code">Code:</label><br>
-        <textarea id="code" name="code" required>print("Hello, World!")</textarea><br>
+    <h1>Python Code Editor</h1>
+    <form id="code-form">
+        <label for="code">Python Code:</label><br>
+        <textarea id="code" name="code">name = input("Enter your name: ")\nprint("Hello", name)</textarea><br>
 
-        <label for="input">Standard Input (stdin):</label><br>
-        <textarea id="input" name="input" placeholder="Enter input for input() functions..."></textarea><br>
+        <label for="input">Input (for input()):</label><br>
+        <textarea id="input" name="input">John</textarea><br>
 
-        <button type="submit">Run Code</button>
+        <button type="submit">Run</button>
     </form>
+
     <h2>Output:</h2>
-    <div id="output"></div>
+    <div id="output">Output will appear here...</div>
 
     <script>
-        const form = document.getElementById('editor-form');
-        form.onsubmit = async (e) => {
+        const form = document.getElementById('code-form');
+        form.onsubmit = async function (e) {
             e.preventDefault();
 
             const response = await fetch('/run', {

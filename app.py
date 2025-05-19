@@ -11,21 +11,24 @@ def index():
 @app.route('/run', methods=['POST'])
 def run_code():
     data = request.get_json()
-    code = data.get('code')
+    code = data.get('code', '')
     user_input = data.get('input', '')
 
+    # Write code to a temp file
     with open('temp.py', 'w') as f:
         f.write(code)
 
     try:
+        # Run code with user input (stdin)
         result = subprocess.run(
             ['python', 'temp.py'],
-            input=user_input.encode('utf-8'),
+            input=user_input,
+            text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             timeout=5
         )
-        output = result.stdout.decode() + result.stderr.decode()
+        output = result.stdout + result.stderr
     except subprocess.TimeoutExpired:
         output = "Error: Code execution timed out."
 
